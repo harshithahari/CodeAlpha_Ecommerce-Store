@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart</title>
+    <style>
+        /* Modern background and font setup */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 40px 20px;
+            color: #2d3748;
+        }
+
+        /* Centered Main Cart Container */
+        .cart-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            padding: 30px;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-top: 0;
+            border-bottom: 2px solid #edf2f7;
+            padding-bottom: 15px;
+        }
+
+        /* Top links styled nicely */
+        .nav-link {
+            display: inline-block;
+            color: #4a5568;
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 20px;
+            transition: color 0.2s;
+        }
+        .nav-link:hover {
+            color: #ff6b6b;
+        }
+
+        /* Individual Product Item Card */
+        .cart-item {
+            background: #f8f9fa;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .cart-item h2 {
+            font-size: 20px;
+            margin: 0 0 10px 0;
+            color: #1a202c;
+        }
+
+        .cart-item p {
+            margin: 5px 0;
+            color: #4a5568;
+            font-size: 15px;
+        }
+
+        /* Remove Button Style */
+        .remove-btn {
+            background-color: #e53e3e;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-top: 10px;
+            transition: background 0.2s;
+        }
+        .remove-btn:hover {
+            background-color: #c53030;
+        }
+
+        /* Totals and Action Section */
+        .cart-summary {
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px solid #edf2f7;
+            text-align: right;
+        }
+
+        .grand-total {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        /* Large Green Place Order Button */
+        .place-order-btn {
+            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+            color: white;
+            padding: 14px 30px;
+            border: none;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+            transition: all 0.2s;
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .place-order-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        }
+        
+        .place-order-btn:active {
+            transform: translateY(0);
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #718096;
+            font-size: 16px;
+            padding: 30px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="cart-container">
+        <a href="{% url 'home' %}" class="nav-link">← Continue Shopping</a>
+
+        <h1>Shopping Cart</h1>
+
+        {% if items %}
+            {% for item in items %}
+                <div class="cart-item">
+                    <h2>{{ item.product.name }}</h2>
+                    <p>Price: <strong>₹{{ item.product.price }}</strong></p>
+                    <p>Quantity: {{ item.quantity }}</p>
+                    <p>Total: <strong>₹{{ item.total_price }}</strong></p>
+                    
+                    <a href="{% url 'remove_item' item.id %}">
+                        <button class="remove-btn">Remove</button>
+                    </a>
+                </div>
+            {% endfor %}
+
+            <div class="cart-summary">
+                <div class="grand-total">Grand Total: ₹{{ total }}</div>
+                
+                <a href="{% url 'place_order' %}" class="place-order-btn">
+                    Place Order ✅
+                </a>
+            </div>
+
+        {% else %}
+            <p class="empty-message">Your cart is empty.</p>
+        {% endif %}
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,68 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color:#fff5f8;
+    margin: 20px;
+}
+
+h1 {
+    text-align: center;
+}
+
+.products {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    border-radius:20px;
+    box-shadow:0 4px 10px rgba(0,0,0,0.1);
+}
+
+.product-card {
+    background: white;
+    width: 250px;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px gray;
+    text-align: center;
+}
+
+.product-card img {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+}
+
+button {
+    background:#ff4f9a;
+    background-color: green;
+    color: white;
+    border: 2px solid black;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+button:hover {
+    background-color: darkgreen;
+}
+/* Update these two sections inside the <style> tag of home.html */
+
+.bubble-area {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: -999 !important; /* Pushes it completely behind everything */
+    overflow: hidden !important;
+    pointer-events: none !important; /* Makes sure you can still click everything */
+}
+
+.bubble {
+    position: absolute !important;
+    bottom: -120px !important;
+    background: rgba(255, 107, 107, 0.2) !important; /* Made slightly darker to see easily */
+    border-radius: 50% !important;
+    animation: floatUp 12s linear infinite !important;
+    display: block !important;
+}

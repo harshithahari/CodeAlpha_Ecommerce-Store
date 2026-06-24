@@ -1,0 +1,240 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My E-commerce Store</title>
+    <link rel="stylesheet" href="{% static 'store/style.css' %}">
+    <style>
+        /* Modern font and setup */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #fff3f8 0%, #f0f4f8 100%); /* Soft warm/cool hybrid gradient */
+            color: #2d3748;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* --- FLOATING BUBBLES BACKGROUND SYSTEM --- */
+        .bubble-area {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* Pushes the bubbles completely behind everything */
+            overflow: hidden;
+        }
+
+        .bubble {
+            position: absolute;
+            bottom: -100px;
+            background: rgba(255, 107, 107, 0.15); /* Soft pinkish/red transparent bubble */
+            border-radius: 50%;
+            animation: floatUp 12s linear infinite;
+        }
+
+        /* Varied sizes and delays for a natural feel */
+        .bubble:nth-child(1) { left: 10%; width: 80px; height: 80px; animation-duration: 10s; background: rgba(40, 167, 69, 0.1); }
+        .bubble:nth-child(2) { left: 25%; width: 40px; height: 40px; animation-duration: 15s; animation-delay: 2s; }
+        .bubble:nth-child(3) { left: 45%; width: 100px; height: 100px; animation-duration: 18s; background: rgba(0, 123, 255, 0.08); }
+        .bubble:nth-child(4) { left: 60%; width: 50px; height: 50px; animation-duration: 12s; animation-delay: 5s; }
+        .bubble:nth-child(5) { left: 75%; width: 75px; height: 75px; animation-duration: 14s; background: rgba(237, 137, 54, 0.1); }
+        .bubble:nth-child(6) { left: 90%; width: 35px; height: 35px; animation-duration: 11s; animation-delay: 1s; }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+                border-radius: 50%;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-120vh) rotate(360deg);
+                opacity: 0;
+                border-radius: 40%;
+            }
+        }
+        /* --- END OF BACKGROUND SYSTEM --- */
+
+        /* Main App Interface Styling */
+        .main-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1; /* Places app interactives reliably in front */
+        }
+
+        h1 {
+            text-align: center;
+            color: #1a202c;
+            font-size: 32px;
+            margin-bottom: 25px;
+            font-weight: 700;
+        }
+
+        .view-cart-link {
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 600;
+            color: #007bff;
+            transition: color 0.2s;
+        }
+        .view-cart-link:hover { color: #ff6b6b; }
+
+        .search-form {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        .search-input {
+            padding: 10px 15px;
+            width: 250px;
+            border: 1px solid #cbd5e0;
+            border-radius: 25px;
+            font-size: 14px;
+            outline: none;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .category-container {
+            margin: 25px 0;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        }
+        .category-container h3 { margin: 0 0 10px 0; font-size: 16px; color: #4a5568; }
+        
+        .category-link {
+            text-decoration: none;
+            color: #4a5568;
+            font-weight: 600;
+            padding: 5px 12px;
+            border-radius: 15px;
+            transition: all 0.2s;
+        }
+        .category-link:hover {
+            color: #ff6b6b;
+            background: rgba(255,107,107,0.1);
+        }
+
+        .products {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            justify-content: flex-start;
+        }
+
+        .product-card {
+            border: none;
+            border-radius: 16px;
+            padding: 20px;
+            width: 280px;
+            background: #ffffff;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+            text-align: center;
+            box-sizing: border-box;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.08);
+        }
+
+        .product-card img {
+            max-width: 100%;
+            height: 180px;
+            object-fit: contain;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .product-card h2 { font-size: 18px; margin: 10px 0; color: #2d3748; }
+        .product-card p { font-size: 14px; color: #718096; height: 40px; overflow: hidden; margin-bottom: 15px; }
+        .product-card h3 { font-size: 20px; color: #1a202c; margin: 10px 0; }
+
+        .btn-green {
+            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(40,167,69,0.2);
+            transition: all 0.2s;
+        }
+        .btn-green:hover {
+            transform: scale(1.03);
+            box-shadow: 0 6px 15px rgba(40,167,69,0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bubble-area">
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+    </div>
+
+    <div class="main-wrapper">
+        <h1>My E-commerce Store</h1>
+
+        <a href="{% url 'cart' %}" class="view-cart-link">🛒 View Cart</a>
+
+        <form method="GET" class="search-form">
+            <input type="text"
+                   name="q"
+                   class="search-input"
+                   placeholder="Search products..."
+                   value="{{ request.GET.q }}">
+            <button type="submit" class="btn-green">
+                Search
+            </button>
+        </form>
+
+        <div class="category-container">
+            <h3>Filter by Category:</h3>
+            <a class="category-link" href="{% url 'home' %}">All</a>
+            <a class="category-link" href="?category=Mobiles">Mobiles</a>
+            <a class="category-link" href="?category=Laptops">Laptops</a>
+            <a class="category-link" href="?category=Accessories">Accessories</a>
+        </div>
+
+        <div class="products">
+            {% for product in products %}
+            <div class="product-card">
+                <img src="{{ product.image }}" alt="{{ product.name }}">
+                <h2>{{ product.name }}</h2>
+                <p>{{ product.description }}</p>
+                <h3>₹{{ product.price }}</h3>
+
+                <a href="{% url 'add_to_cart' product.id %}">
+                    <button class="btn-green">
+                        Add to Cart
+                    </button>
+                </a>
+            </div>
+            {% empty %}
+            <p style="text-align: center; width: 100%; color: #718096;">No products found.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+</body>
+</html>
