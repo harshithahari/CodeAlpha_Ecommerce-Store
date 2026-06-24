@@ -120,25 +120,47 @@ def logout_user(request):
     messages.success(request, "Logged out successfully.")
     return redirect('login')
 
-# Place Order View (Uses Authenticated User)
+# Place Order View (അഡ്രസ്സ് വിവരങ്ങൾ സ്വീകരിക്കുന്നു)
 def place_order(request):
     if not request.user.is_authenticated:
         return redirect('login')
 
-    # Target the logged in user's active cart
-    order = Order.objects.filter(user=request.user, completed=False).first()
-    
-    if order:
-        order.completed = True
-        order.save()
-        messages.success(request, "Order placed successfully!")
-        return redirect('order_success')
+    if request.method == 'POST':
+        # കാർട്ടിലെ ഫോമിൽ നിന്ന് അഡ്രസ്സ് വിവരങ്ങൾ എടുക്കുന്നു
+        name = request.POST.get('name')
+        address = request.POST.get('address')
+        phone = request.POST.get('phone')
+
+        # യൂസറുടെ നിലവിലെ ആക്റ്റീവ് കാർട്ട് കണ്ടുപിടിക്കുന്നു
+        order = Order.objects.filter(user=request.user, completed=False).first()
         
+        if order:
+            order.completed = True
+            order.save()
+            messages.success(request, "Order placed successfully!")
+            
+            # ഈ വിവരങ്ങൾ താല്ക്കാലികമായി സെഷനിൽ (Session) സൂക്ഷിക്കുന്നു (അടുത്ത പേജിൽ കാണിക്കാൻ)
+            request.session['shipping_name'] = name
+            request.session['shipping_address'] = address
+            request.session['shipping_phone'] = phone
+            
+            return redirect('order_success')
+            
     return redirect('cart')
 
-# Order Success Page View
+# Order Success Page View (അഡ്രസ്സ് പേജിലേക്ക് കാണിക്കുന്നു)
 def order_success(request):
-    return render(request, 'store/order_success.html')
+    # സെഷനിൽ നിന്ന് വിവരങ്ങൾ എടുക്കുന്നു
+    name = request.session.get('shipping_name', '')
+    address = request.session.get('shipping_address', '')
+    phone = request.session.get('shipping_phone', '')
+
+    context = {
+        'name': name,
+        'address': address,
+        'phone': phone
+    }
+    return render(request, 'store/order_success.html', context)
 
 # Order History Page View
 def order_history(request):

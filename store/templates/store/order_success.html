@@ -69,7 +69,37 @@
         .sub-text {
             color: #a0aec0;
             font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        /* Shipping Details Box Styles */
+        .shipping-box {
+            background: #f8f9fa;
+            border: 1px solid #edf2f7;
+            border-radius: 12px;
+            padding: 20px;
             margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .shipping-box h3 {
+            margin-top: 0;
+            margin-bottom: 12px;
+            font-size: 16px;
+            color: #2d3748;
+            border-bottom: 1px solid #edf2f7;
+            padding-bottom: 6px;
+        }
+
+        .shipping-detail {
+            font-size: 14px;
+            color: #4a5568;
+            margin: 6px 0;
+            line-height: 1.4;
+        }
+
+        .shipping-detail strong {
+            color: #2d3748;
         }
 
         /* Beautiful "Continue Shopping" Box Button */
@@ -109,18 +139,24 @@
 <body>
 
     <div class="success-card">
-        <!-- Success Badge -->
         <div class="icon-container">
             ✔
         </div>
 
-        <!-- Confirmation Text -->
         <h1>Order Confirmed!</h1>
         <p>Thank you for shopping with us.</p>
         <p>Your order has been recorded successfully.</p>
         <div class="sub-text">No further payment action is required.</div>
         
-        <!-- Beautifully Boxed Link Button -->
+        {% if name or address or phone %}
+            <div class="shipping-box">
+                <h3>📦 Shipping Details</h3>
+                <div class="shipping-detail"><strong>Name:</strong> {{ name }}</div>
+                <div class="shipping-detail"><strong>Phone:</strong> {{ phone }}</div>
+                <div class="shipping-detail"><strong>Address:</strong> {{ address }}</div>
+            </div>
+        {% endif %}
+        
         <a href="{% url 'home' %}" class="continue-btn">
             🛍 Continue Shopping
         </a>
