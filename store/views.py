@@ -99,7 +99,7 @@ def cart(request):
 
     return render(request, 'store/cart.html', {'items': items, 'total': total})
 
-# Remove Item from Cart (ലോഗിൻ ചെയ്യാത്തവർക്കും വർക്ക് ആകുന്ന രീതിയിൽ മാറ്റിയത്)
+# Remove Item from Cart
 def remove_item(request, item_id):
     if request.user.is_authenticated:
         user = request.user
