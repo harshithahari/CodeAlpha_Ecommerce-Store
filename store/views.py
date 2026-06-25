@@ -9,7 +9,6 @@ def home(request):
     query = request.GET.get('q')
     category = request.GET.get('category')
 
-    # ഡാറ്റാബേസ് പുതിയതായതുകൊണ്ട് ആദ്യ തവണ തനിയെ പ്രൊഡക്റ്റുകൾ ഉണ്ടാക്കുന്നു
     if not Product.objects.exists():
         Product.objects.create(
             name="Dell 14 plus",
