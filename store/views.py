@@ -9,7 +9,7 @@ def home(request):
     query = request.GET.get('q')
     category = request.GET.get('category')
 
-   
+    # ഡാറ്റാബേസ് പുതിയതായതുകൊണ്ട് ആദ്യ തവണ തനിയെ പ്രൊഡക്റ്റുകൾ ഉണ്ടാക്കുന്നു
     if not Product.objects.exists():
         Product.objects.create(
             name="Dell 14 plus",
@@ -25,22 +25,27 @@ def home(request):
             description="Small Bluetooth On Ear Headphones",
             image="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500"
         )
+        Product.objects.create(
+            name="Samsung Galaxy S25",
+            price=71000.00,
+            category="Mobiles",
+            description="Meet the New Galaxy S25 and S25+, the smartphones with a Next-gen camera",
+            image="https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=500"
+        )
 
     products = Product.objects.all()
 
-    # Search filter
     if query:
         products = products.filter(name__icontains=query)
 
-    # Category filter
     if category:
         products = products.filter(category=category)
 
     return render(request, 'store/home.html', {'products': products})
+
 # Add Product to Cart
 def add_to_cart(request, product_id):
     product = get_object_or_404(Product, id=product_id)
-    
     
     if request.user.is_authenticated:
         user = request.user
@@ -50,7 +55,6 @@ def add_to_cart(request, product_id):
             order_item.quantity += 1
             order_item.save()
     else:
-       
         if not request.session.session_key:
             request.session.create()
             
@@ -68,7 +72,7 @@ def add_to_cart(request, product_id):
     messages.success(request, f"{product.name} added to cart.")
     return redirect('cart')
 
-
+# View Cart
 def cart(request):
     items = []
     total = 0
@@ -80,13 +84,11 @@ def cart(request):
             items = OrderItem.objects.filter(order=order)
             total = sum(item.total_price for item in items)
     else:
-        
         cart = request.session.get('cart', {})
         for product_id, quantity in cart.items():
             product = Product.objects.filter(id=int(product_id)).first()
             if product:
                 total_price = product.price * quantity
-                
                 items.append({
                     'product': product,
                     'quantity': quantity,
@@ -97,14 +99,19 @@ def cart(request):
 
     return render(request, 'store/cart.html', {'items': items, 'total': total})
 
-# Remove Item from Cart
+# Remove Item from Cart (ലോഗിൻ ചെയ്യാത്തവർക്കും വർക്ക് ആകുന്ന രീതിയിൽ മാറ്റിയത്)
 def remove_item(request, item_id):
-    if not request.user.is_authenticated:
-        return redirect('login')
-
-    user = request.user
-    item = get_object_or_404(OrderItem, id=item_id, order__user=user)
-    item.delete()
+    if request.user.is_authenticated:
+        user = request.user
+        item = get_object_or_404(OrderItem, id=item_id, order__user=user)
+        item.delete()
+    else:
+        cart = request.session.get('cart', {})
+        item_id_str = str(item_id)
+        if item_id_str in cart:
+            del cart[item_id_str]
+            request.session['cart'] = cart
+            request.session.modified = True
 
     messages.success(request, "Item removed from cart.")
     return redirect('cart')
@@ -156,17 +163,15 @@ def logout_user(request):
     messages.success(request, "Logged out successfully.")
     return redirect('login')
 
-
+# Place Order
 def place_order(request):
     if not request.user.is_authenticated:
         return redirect('login')
 
     if request.method == 'POST':
-    
         name = request.POST.get('name')
         address = request.POST.get('address')
         phone = request.POST.get('phone')
-
 
         order = Order.objects.filter(user=request.user, completed=False).first()
         
@@ -183,9 +188,8 @@ def place_order(request):
             
     return redirect('cart')
 
-
+# Order Success
 def order_success(request):
-    
     name = request.session.get('shipping_name', '')
     address = request.session.get('shipping_address', '')
     phone = request.session.get('shipping_phone', '')
@@ -197,7 +201,7 @@ def order_success(request):
     }
     return render(request, 'store/order_success.html', context)
 
-# Order History Page View
+# Order History
 def order_history(request):
     if not request.user.is_authenticated:
         return redirect('login')
