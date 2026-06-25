@@ -6,42 +6,8 @@ from .models import Product, Order, OrderItem
 
 # Home Page
 def home(request):
-    query = request.GET.get('q')
-    category = request.GET.get('category')
-
-    if not Product.objects.exists():
-        Product.objects.create(
-            name="Dell 14 plus",
-            price=73100.00,
-            category="Laptops",
-            description="Core 7 240H | 16GB LPDDR5X | 512GB SSD",
-            image="https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=500" 
-        )
-        Product.objects.create(
-            name="headphone",
-            price=4999.00,
-            category="Accessories",
-            description="Small Bluetooth On Ear Headphones",
-            image="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500"
-        )
-        Product.objects.create(
-            name="Samsung Galaxy S25",
-            price=71000.00,
-            category="Mobiles",
-            description="Meet the New Galaxy S25 and S25+, the smartphones with a Next-gen camera",
-            image="https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=500"
-        )
-
     products = Product.objects.all()
-
-    if query:
-        products = products.filter(name__icontains=query)
-
-    if category:
-        products = products.filter(category=category)
-
-    return render(request, 'store/home.html', {'products': products})
-
+    return render(request, 'store/home.html', {'products': products})       
 # Add Product to Cart
 def add_to_cart(request, product_id):
     product = get_object_or_404(Product, id=product_id)
