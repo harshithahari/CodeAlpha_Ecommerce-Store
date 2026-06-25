@@ -39,41 +39,61 @@ def home(request):
     return render(request, 'store/home.html', {'products': products})
 # Add Product to Cart
 def add_to_cart(request, product_id):
-    if not request.user.is_authenticated:
-        messages.warning(request, "Please login first.")
-        return redirect('login')
-
     product = get_object_or_404(Product, id=product_id)
-    user = request.user
-
-    # Get existing cart or create a new one
-    order, created = Order.objects.get_or_create(user=user, completed=False)
-
-    # Get existing item or create a new one
-    order_item, created = OrderItem.objects.get_or_create(order=order, product=product)
-
-    if not created:
-        order_item.quantity += 1
-        order_item.save()
+    
+    
+    if request.user.is_authenticated:
+        user = request.user
+        order, created = Order.objects.get_or_create(user=user, completed=False)
+        order_item, created = OrderItem.objects.get_or_create(order=order, product=product)
+        if not created:
+            order_item.quantity += 1
+            order_item.save()
+    else:
+       
+        if not request.session.session_key:
+            request.session.create()
+            
+        cart = request.session.get('cart', {})
+        product_id_str = str(product_id)
+        
+        if product_id_str in cart:
+            cart[product_id_str] += 1
+        else:
+            cart[product_id_str] = 1
+            
+        request.session['cart'] = cart
+        request.session.modified = True
 
     messages.success(request, f"{product.name} added to cart.")
     return redirect('cart')
 
-# View Cart
+
 def cart(request):
-    if not request.user.is_authenticated:
-        messages.warning(request, "Please login first.")
-        return redirect('login')
-
-    user = request.user
-    order = Order.objects.filter(user=user, completed=False).first()
-
     items = []
     total = 0
 
-    if order:
-        items = OrderItem.objects.filter(order=order)
-        total = sum(item.total_price for item in items)
+    if request.user.is_authenticated:
+        user = request.user
+        order = Order.objects.filter(user=user, completed=False).first()
+        if order:
+            items = OrderItem.objects.filter(order=order)
+            total = sum(item.total_price for item in items)
+    else:
+        
+        cart = request.session.get('cart', {})
+        for product_id, quantity in cart.items():
+            product = Product.objects.filter(id=int(product_id)).first()
+            if product:
+                total_price = product.price * quantity
+                
+                items.append({
+                    'product': product,
+                    'quantity': quantity,
+                    'total_price': total_price,
+                    'id': product_id
+                })
+                total += total_price
 
     return render(request, 'store/cart.html', {'items': items, 'total': total})
 
@@ -136,18 +156,18 @@ def logout_user(request):
     messages.success(request, "Logged out successfully.")
     return redirect('login')
 
-# Place Order View (അഡ്രസ്സ് വിവരങ്ങൾ സ്വീകരിക്കുന്നു)
+
 def place_order(request):
     if not request.user.is_authenticated:
         return redirect('login')
 
     if request.method == 'POST':
-        # കാർട്ടിലെ ഫോമിൽ നിന്ന് അഡ്രസ്സ് വിവരങ്ങൾ എടുക്കുന്നു
+    
         name = request.POST.get('name')
         address = request.POST.get('address')
         phone = request.POST.get('phone')
 
-        # യൂസറുടെ നിലവിലെ ആക്റ്റീവ് കാർട്ട് കണ്ടുപിടിക്കുന്നു
+
         order = Order.objects.filter(user=request.user, completed=False).first()
         
         if order:
@@ -155,7 +175,6 @@ def place_order(request):
             order.save()
             messages.success(request, "Order placed successfully!")
             
-            # ഈ വിവരങ്ങൾ താല്ക്കാലികമായി സെഷനിൽ (Session) സൂക്ഷിക്കുന്നു (അടുത്ത പേജിൽ കാണിക്കാൻ)
             request.session['shipping_name'] = name
             request.session['shipping_address'] = address
             request.session['shipping_phone'] = phone
@@ -164,9 +183,9 @@ def place_order(request):
             
     return redirect('cart')
 
-# Order Success Page View (അഡ്രസ്സ് പേജിലേക്ക് കാണിക്കുന്നു)
+
 def order_success(request):
-    # സെഷനിൽ നിന്ന് വിവരങ്ങൾ എടുക്കുന്നു
+    
     name = request.session.get('shipping_name', '')
     address = request.session.get('shipping_address', '')
     phone = request.session.get('shipping_phone', '')
