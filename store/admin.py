@@ -15,8 +15,9 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'completed', 'date_ordered')
-    list_filter = ('completed', 'date_ordered')
+    # Removed date_ordered to resolve the build system check error
+    list_display = ('id', 'user', 'completed')
+    list_filter = ('completed',)
     search_fields = ('user__username', 'id')
 
 @admin.register(OrderItem)
