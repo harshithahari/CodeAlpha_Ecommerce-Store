@@ -1,9 +1,25 @@
 from django.contrib import admin
 from .models import Product, Order, OrderItem
 
-admin.site.register(Product)
-admin.site.register(Order)
-admin.site.register(OrderItem)
+# Customizing the Admin Panel Interface Headers
 admin.site.site_header = "Online Store Admin"
 admin.site.site_title = "Online Store Admin Portal"
 admin.site.index_title = "Welcome to Online Store Management Portal"
+
+# Advanced registration for better layout visibility
+@admin.register(Product)
+class ProductAdmin(admin.ModelAdmin):
+    list_display = ('name', 'price', 'category')
+    list_filter = ('category',)
+    search_fields = ('name', 'category')
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'completed', 'date_ordered')
+    list_filter = ('completed', 'date_ordered')
+    search_fields = ('user__username', 'id')
+
+@admin.register(OrderItem)
+class OrderItemAdmin(admin.ModelAdmin):
+    list_display = ('id', 'order', 'product', 'quantity')
+    search_fields = ('order__id', 'product__name')
